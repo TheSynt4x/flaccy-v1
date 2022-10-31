@@ -163,7 +163,6 @@ def export_audio(song_path: str):
 
 async def main():
     songs = []
-    other = []
 
     processed_songs = []
     with open("logs/processed.log", "r", encoding="utf-8") as f:
@@ -184,9 +183,7 @@ async def main():
     await asyncio.gather(*songs)
 
     for s in SESSION_SONGS:
-        other.append(place_files(s))
-
-    await asyncio.gather(*other)
+        place_files(s)
 
 
 asyncio.run(main())

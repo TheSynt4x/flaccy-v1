@@ -15,7 +15,6 @@ except Exception as e:
     ftp = None
 
 
-@async_wrap
 def place_files(path):
     if ftp is None:
         print("Need to start foobar2000 ftp server")
