@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.vscode/
+.mypy_cache/
+
+flaccy.db
+.env
+
+*.db
+logs/*.txt
+logs/processed.log
