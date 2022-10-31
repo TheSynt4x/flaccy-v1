@@ -6,4 +6,5 @@ class Library(Base):
     id = IntegerField(primary_key=True)
     name = CharField()
     path = TextField()
+    output_path = CharField()
     formats = TextField()

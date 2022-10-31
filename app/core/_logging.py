@@ -17,8 +17,8 @@ console.setFormatter(formatter)
 
 logging.getLogger("").addHandler(console)
 
-logging.info("Running Flaccy")
+logging.info("Running flaccy")
 
-logger = logging.getLogger("Flaccy")
+logger = logging.getLogger("flaccy")
 
 logging.getLogger("main.orm_sqlite.model").setLevel(logging.WARNING)
