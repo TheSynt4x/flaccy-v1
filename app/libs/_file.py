@@ -1,11 +1,12 @@
-from asyncio.log import logger
 import glob
 import os
 import shutil
 from pathlib import Path
 from typing import List
 
+import requests
 from app import schemas
+from app.core import logger
 from app.utils import clean_filename
 
 
@@ -29,10 +30,10 @@ class FileWrapper:
 
                 file_path = Path(cover_file)
 
-                if file_path.name.lower() in ["cover.jpg", "cover.png"]:
+                if file_path.name.lower() in ["cover.jpg", "cover.png", "cover.jpeg"]:
                     return file_path
 
-                if file_path.suffix in [".jpg", ".png"]:
+                if file_path.suffix in [".jpg", ".png", ".jpeg"]:
                     return file_path
 
         return None
@@ -55,6 +56,24 @@ class FileWrapper:
     def save_image(self, album_directory: str, song: schemas.Song):
         with open(f"{album_directory}\\cover.png", "wb") as binary_file:
             binary_file.write(song.cover)
+
+    def save_image_from_url(self, album_directory: str, image_url: str):
+        response = requests.get(
+            image_url,
+            headers={
+                "user-agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/106.0.0.0 Safari/537.36"
+                )
+            },
+        )
+
+        if not response.ok:
+            return
+
+        with open(f"{album_directory}\\cover.jpeg", "wb") as f:
+            f.write(response.content)
 
     def get_export_filename(self, album_directory: str, song: schemas.Song):
         return os.path.join(album_directory, clean_filename(f"{song.title}.mp3"))
