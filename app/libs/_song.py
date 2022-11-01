@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Optional, Tuple
 
-from app import models, schemas
-from app.db import db
 from mutagen.flac import FLAC
+
+from app import models, schemas
 
 
 class SongWrapper:
