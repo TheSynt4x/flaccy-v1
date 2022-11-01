@@ -1,7 +1,7 @@
-from asyncio.log import logger
 from typing import Any, Dict, List, Optional, Tuple
 
 from app import models, schemas
+from app.db import db
 from mutagen.flac import FLAC
 
 
@@ -59,7 +59,11 @@ class SongWrapper:
         }
 
         song = models.Song.get_or_create(
-            **{**song_data, "is_processed": is_processed, "is_uploaded": is_uploaded}
+            **{
+                **song_data,
+                "is_processed": is_processed,
+                "is_uploaded": is_uploaded,
+            }
         )
 
         return song

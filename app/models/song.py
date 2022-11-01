@@ -14,11 +14,13 @@ class Song(Base):
     output_file = CharField()
 
     @classmethod
-    def get_by_output_file(cls: "Song", output_file: str):
+    def get_by_output_file(cls: "Song", output_file: str) -> "Song":
         return cls.select().where(cls.output_file == output_file).get()
 
     @classmethod
-    def update_upload_status(cls: "Song", output_file: str, is_uploaded: bool = False):
+    def update_upload_status(
+        cls: "Song", output_file: str, is_uploaded: bool = False
+    ) -> "Song":
         s = cls.get_by_output_file(output_file)
 
         if not s:
