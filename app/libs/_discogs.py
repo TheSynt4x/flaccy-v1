@@ -1,6 +1,7 @@
 import discogs_client
+
 from app import schemas
-from app.core import logger, settings
+from app.core import settings
 
 
 class DiscogsWrapper:

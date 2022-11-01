@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import List
 
 import requests
+
 from app import schemas
-from app.core import logger
 from app.utils import clean_filename
 
 

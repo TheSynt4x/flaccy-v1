@@ -1,11 +1,10 @@
 import asyncio
+from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 
 from app import libs, models, schemas
 from app.core import logger
 from configurator import create_tables
-
-from concurrent.futures.thread import ThreadPoolExecutor
 
 create_tables()
 

@@ -1,5 +1,5 @@
-from app.db import db
 from app import models
+from app.db import db
 
 
 def create_tables():

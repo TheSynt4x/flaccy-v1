@@ -1,7 +1,8 @@
-from app import schemas
 from mutagen.easyid3 import EasyID3
-from mutagen.id3 import APIC, ID3
 from mutagen.flac import FLAC
+from mutagen.id3 import APIC, ID3
+
+from app import schemas
 
 
 class TagWrapper:

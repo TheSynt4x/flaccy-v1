@@ -1,8 +1,7 @@
-from app import libs, models
-from app.core import logger, settings
 from pydub import AudioSegment
 
-from app import models
+from app import libs, models
+from app.core import logger, settings
 
 
 class AudioService:
