@@ -10,6 +10,6 @@ lint:
 	isort --profile black --check .
 	flake8 .
 
-.PHONY: devserver
-devserver:
-	sh ./scripts/devserver.sh
+.PHONY: export
+export:
+	sh ./scripts/export.sh
