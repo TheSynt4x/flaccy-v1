@@ -43,6 +43,15 @@ class AudioService:
                 with open(first_album_image.absolute(), "rb") as data:
                     libs.tag.set_apic(mp3_outfile, data.read())
 
+        if not (song.cover and first_album_image):
+            cover = libs.discogs.get_album_art(song)
+
+            if cover:
+                libs.file.save_image_from_url(album_directory, cover)
+
+                with open(f"{album_directory}\\cover.jpeg", "rb") as data:
+                    libs.tag.set_apic(mp3_outfile, data.read())
+
         libs.song.process_song(song, is_processed=1)
 
         session_album = libs.file.get_parent_path(song.output_file)

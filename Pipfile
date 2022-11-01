@@ -8,6 +8,8 @@ mutagen = "*"
 pydub = "*"
 pydantic = {extras = ["dotenv"], version = "*"}
 peewee = "*"
+python3-discogs-client = "*"
+requests = "*"
 
 [dev-packages]
 black = "*"

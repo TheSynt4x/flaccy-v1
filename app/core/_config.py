@@ -8,6 +8,8 @@ class Config(BaseSettings):
     ftp_username: Optional[str] = None
     ftp_password: Optional[str] = None
 
+    discogs_token: Optional[str] = None
+
     session_albums: List[str] = []
 
     class Config:
