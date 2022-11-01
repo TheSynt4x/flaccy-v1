@@ -1,4 +1,4 @@
-from app import libs
+from app import libs, models
 from app.core import logger, settings
 from pydub import AudioSegment
 
