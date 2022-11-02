@@ -9,3 +9,7 @@ class Library(Base):
     path = TextField()
     output_path = CharField()
     formats = TextField()
+
+    @classmethod
+    def all(cls: "Library") -> "Library":
+        return [l for l in cls.select().dicts()]

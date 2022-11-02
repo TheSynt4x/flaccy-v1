@@ -31,3 +31,7 @@ class Song(Base):
         s.save()
 
         return s
+
+    @classmethod
+    def get_processed_songs(cls: "Song"):
+        return cls.select().where(cls.is_processed == 1)
