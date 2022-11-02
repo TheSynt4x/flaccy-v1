@@ -9,6 +9,9 @@ from app import libs, models, schemas
 from app.core import logger, settings
 
 
+from peewee import DoesNotExist
+
+
 class AudioService:
     def export_audio(self, output_path: str, song_path: str):
         song, flac = libs.song.get_song_info(song_path)
@@ -20,12 +23,13 @@ class AudioService:
 
         try:
             db_song = models.Song.get_by_output_file(song.output_file)
-        except Exception:
+        except DoesNotExist:
             db_song = None
 
         if libs.file.export_exists(album_directory, song) and db_song:
             if not db_song.is_processed:
                 db_song.is_processed = True
+                db_song.save()
                 return
 
             if db_song.is_uploaded:
