@@ -53,11 +53,7 @@ def sync(
         typer.echo(
             asyncio.run(
                 services.audio.process_songs(
-                    library,
-                    songs,
-                    output_path,
-                    source_path,
-                    disable_ftp,
+                    library, songs, output_path, source_path, disable_ftp
                 )
             )
         )
@@ -87,11 +83,7 @@ def full_sync(
         typer.echo(
             asyncio.run(
                 services.audio.process_songs(
-                    library,
-                    songs,
-                    output_path,
-                    source_path,
-                    disable_ftp,
+                    library, songs, output_path, source_path, disable_ftp
                 )
             )
         )
