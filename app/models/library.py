@@ -12,4 +12,4 @@ class Library(Base):
 
     @classmethod
     def all(cls: "Library") -> "Library":
-        return [l for l in cls.select().dicts()]
+        return [library for library in cls.select().dicts()]

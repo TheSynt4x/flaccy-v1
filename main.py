@@ -1,9 +1,4 @@
-import asyncio
-
-from app import app
-from configurator import create_tables
-
-create_tables()
+from app.app import app
 
 if __name__ == "__main__":
-    asyncio.run(app.main())
+    app()
