@@ -4,9 +4,6 @@ from functools import partial
 
 from app import libs, models, schemas
 from app.core import logger
-from configurator import create_tables
-
-create_tables()
 
 
 def export_audio(output_path: str, song_path: str):
