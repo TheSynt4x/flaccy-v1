@@ -2,6 +2,7 @@ import asyncio
 from typing import Optional
 
 import typer
+from rich.prompt import Confirm, Prompt
 
 from app import libs, models, schemas, services
 from app.core import logger
@@ -18,10 +19,10 @@ def setup():
 
     db.create_tables([models.Library, models.Song])
 
-    name = typer.prompt("Library name")
-    source_path = typer.prompt("Library path")
-    output_path = typer.prompt("Output path (where files should be saved)")
-    formats = typer.prompt("Library formats (which files are in your library)")
+    name = Prompt.ask("Library name")
+    source_path = Prompt.ask("Library path")
+    output_path = Prompt.ask("Output path (where files should be saved)")
+    formats = Prompt.ask("Library formats (which files are in your library)")
 
     library = models.Library(
         name=name, path=source_path, output_path=output_path, formats=formats
@@ -72,7 +73,7 @@ def full_sync(
     Run a full sync for all saved libraries.
     """
 
-    confirm = typer.confirm("Are you sure you want to run a full sync?")
+    confirm = Confirm.ask("Are you sure you want to run a full sync?")
 
     if not confirm:
         logger.info("Not running a full sync")
