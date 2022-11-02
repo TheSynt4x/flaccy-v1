@@ -1,7 +1,11 @@
-from pydub import AudioSegment
+import asyncio
+from concurrent.futures.thread import ThreadPoolExecutor
+from functools import partial
+from typing import List, Optional
 
-from app import libs, models
+from app import libs, models, schemas
 from app.core import logger, settings
+from pydub import AudioSegment
 
 
 class AudioService:
@@ -15,7 +19,7 @@ class AudioService:
 
         try:
             db_song = models.Song.get_by_output_file(song.output_file)
-        except:
+        except Exception:
             db_song = None
 
         if libs.file.export_exists(album_directory, song) and db_song:
@@ -60,6 +64,38 @@ class AudioService:
             settings.session_albums.append(session_album)
 
         logger.info(f"{song.title} export successful")
+
+    async def process_songs(
+        self,
+        library: schemas.Library,
+        songs: List[str] = None,
+        output_path: Optional[str] = None,
+        source_path: Optional[str] = None,
+    ):
+        if not songs:
+            songs = []
+
+        loop = asyncio.get_running_loop()
+        executor = ThreadPoolExecutor(max_workers=4)
+        futures = []
+
+        if output_path:
+            library.output_path = output_path
+
+        if source_path:
+            library.path = source_path
+
+        for song in songs:
+            futures.append(
+                loop.run_in_executor(
+                    executor, partial(self.export_audio, library.output_path, song)
+                )
+            )
+
+        await asyncio.gather(*futures)
+
+        for album in settings.session_albums:
+            libs.ftp.upload_files(album)
 
 
 audio = AudioService()
