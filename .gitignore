@@ -9,4 +9,4 @@ flaccy.db
 
 *.db
 logs/*.txt
-logs/processed.log
+logs/*.log
