@@ -3,9 +3,10 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 from typing import List, Optional
 
+from pydub import AudioSegment
+
 from app import libs, models, schemas
 from app.core import logger, settings
-from pydub import AudioSegment
 
 
 class AudioService:
@@ -71,6 +72,7 @@ class AudioService:
         songs: List[str] = None,
         output_path: Optional[str] = None,
         source_path: Optional[str] = None,
+        disable_ftp: bool = False,
     ):
         if not songs:
             songs = []
@@ -94,8 +96,9 @@ class AudioService:
 
         await asyncio.gather(*futures)
 
-        for album in settings.session_albums:
-            libs.ftp.upload_files(album)
+        if not disable_ftp:
+            for album in settings.session_albums:
+                libs.ftp.upload_files(album)
 
 
 audio = AudioService()
