@@ -1,5 +1,4 @@
 import asyncio
-from asyncio.log import logger
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 
