@@ -28,7 +28,7 @@ async def migrator():
 
     futures = []
 
-    libraries = [schemas.Library(**l) for l in models.Library.select().dicts()]
+    libraries = [schemas.Library(**l) for l in models.Library.all()]
 
     for library in libraries:
         for song_path in libs.file.get_song_files(library):

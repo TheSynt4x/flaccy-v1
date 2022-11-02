@@ -1,4 +1,5 @@
 import asyncio
+from asyncio.log import logger
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
 
@@ -11,13 +12,10 @@ async def main():
     executor = ThreadPoolExecutor(max_workers=4)
     futures = []
 
-    libraries = [schemas.Library(**l) for l in models.Library.select().dicts()]
+    libraries = [schemas.Library(**l) for l in models.Library.all()]
 
     for library in libraries:
-        processed_songs = [
-            p.source_file
-            for p in models.Song.select().where(models.Song.is_processed == 1)
-        ]
+        processed_songs = [p.source_file for p in models.Song.get_processed_songs()]
 
         difference = list(set(libs.file.get_song_files(library)) - set(processed_songs))
 
