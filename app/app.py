@@ -5,7 +5,7 @@ import typer
 from rich.prompt import Confirm, Prompt
 
 from app import libs, models, schemas, services
-from app.core import logger
+from app.core import logger, settings
 from app.db import db
 
 db.create_tables([models.Library, models.Song, models.UploadedAlbum])
@@ -43,6 +43,10 @@ def sync(
     Run a normal sync for all saved libraries.
     """
 
+    settings.override_source_path = source_path
+    settings.override_output_path = output_path
+    settings.disable_ftp = disable_ftp
+
     libraries = [schemas.Library(**library) for library in models.Library.all()]
 
     for library in libraries:
@@ -50,11 +54,9 @@ def sync(
 
         songs = list(set(libs.file.get_song_files(library)) - set(processed_songs))
 
-        asyncio.run(
-            services.audio.process_songs(library, songs, output_path, source_path)
-        )
+        asyncio.run(services.audio.process_songs(library, songs))
 
-    if not disable_ftp:
+    if not settings.disable_ftp:
         for album in models.UploadedAlbum.get_unuploaded_albums():
             libs.ftp.upload_files(album.output_path)
 
@@ -69,6 +71,10 @@ def full_sync(
     Run a full sync for all saved libraries.
     """
 
+    settings.override_source_path = source_path
+    settings.override_output_path = output_path
+    settings.disable_ftp = disable_ftp
+
     confirm = Confirm.ask("Are you sure you want to run a full sync?")
 
     if not confirm:
@@ -80,10 +86,8 @@ def full_sync(
     for library in libraries:
         songs = libs.file.get_song_files(library)
 
-        asyncio.run(
-            services.audio.process_songs(library, songs, output_path, source_path)
-        )
+        asyncio.run(services.audio.process_songs(library, songs))
 
-    if not disable_ftp:
+    if not settings.disable_ftp:
         for album in models.UploadedAlbum.get_unuploaded_albums():
             libs.ftp.upload_files(album.output_path)

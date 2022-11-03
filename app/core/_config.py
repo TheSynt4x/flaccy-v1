@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseSettings
 
@@ -10,7 +10,9 @@ class Config(BaseSettings):
 
     discogs_token: Optional[str] = None
 
-    session_albums: List[str] = []
+    disable_ftp: bool = False
+    override_source_path: Optional[str] = None
+    override_output_path: Optional[str] = None
 
     class Config:
         env_file = ".env"

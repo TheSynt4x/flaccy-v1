@@ -3,9 +3,10 @@ from asyncio.log import logger
 from ftplib import FTP, error_perm
 from pathlib import Path
 
+from peewee import DoesNotExist
+
 from app import models
 from app.core import settings
-from peewee import DoesNotExist
 
 
 class FtpWrapper:

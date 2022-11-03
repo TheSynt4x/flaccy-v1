@@ -1,17 +1,13 @@
 import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import List, Optional
+from typing import List
 
+from peewee import DoesNotExist
 from pydub import AudioSegment
 
 from app import libs, models, schemas
 from app.core import logger, settings
-
-
-from peewee import DoesNotExist
-
-from pathlib import Path
 
 
 class AudioService:
@@ -64,25 +60,22 @@ class AudioService:
 
         libs.song.process_song(song, is_processed=1)
 
-        models.UploadedAlbum.get_or_create(
-            **{
-                "name": song.album,
-                "artist": song.artist,
-                "source_path": libs.file.get_parent_path(song.source_file),
-                "output_path": libs.file.get_parent_path(song.output_file),
-                "is_uploaded": 0,
-            }
-        )
+        try:
+            models.UploadedAlbum.get_by_output_path(
+                libs.file.get_parent_path(song.output_file)
+            )
+        except DoesNotExist:
+            models.UploadedAlbum.create(
+                name=song.album,
+                artist=song.artist,
+                source_path=libs.file.get_parent_path(song.source_file),
+                output_path=libs.file.get_parent_path(song.output_file),
+                is_uploaded=0,
+            )
 
         logger.info(f"{song.title} export successful")
 
-    async def process_songs(
-        self,
-        library: schemas.Library,
-        songs: List[str] = None,
-        output_path: Optional[str] = None,
-        source_path: Optional[str] = None,
-    ):
+    async def process_songs(self, library: schemas.Library, songs: List[str] = None):
         if not songs:
             songs = []
 
@@ -90,11 +83,11 @@ class AudioService:
         executor = ThreadPoolExecutor(max_workers=4)
         futures = []
 
-        if output_path:
-            library.output_path = output_path
+        if settings.override_output_path:
+            library.output_path = settings.override_output_path
 
-        if source_path:
-            library.path = source_path
+        if settings.override_source_path:
+            library.path = settings.override_source_path
 
         for song in songs:
             futures.append(
