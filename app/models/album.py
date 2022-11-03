@@ -1,8 +1,8 @@
-from peewee import CharField, IntegerField, BooleanField
-
-from app.models import Base
-
 from typing import List
+
+from peewee import BooleanField, CharField, IntegerField
+
+from app.models.base import Base
 
 
 class UploadedAlbum(Base):

@@ -1,6 +1,6 @@
 from peewee import CharField, IntegerField, TextField
 
-from app.models import Base
+from app.models.base import Base
 
 
 class Library(Base):

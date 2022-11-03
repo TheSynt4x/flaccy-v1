@@ -1,6 +1,6 @@
 from peewee import BooleanField, CharField, IntegerField
 
-from app.models import Base
+from app.models.base import Base
 
 
 class Song(Base):
