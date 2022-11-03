@@ -87,3 +87,10 @@ def full_sync(
                 )
             )
         )
+
+
+@app.command()
+def test():
+    libs.ftp.upload_song(
+        "D:\\Music\\Output\\Saosin - Translating the Name (2003)\\They Perched on Their Stilts, Pointing and Daring Me to Break Custom.mp3"
+    )

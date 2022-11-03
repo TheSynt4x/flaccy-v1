@@ -53,10 +53,6 @@ class FileWrapper:
     def get_parent_path(self, path: str):
         return Path(path).parent.absolute()
 
-    def save_image(self, album_directory: str, song: schemas.Song):
-        with open(f"{album_directory}\\cover.png", "wb") as binary_file:
-            binary_file.write(song.cover)
-
     def save_image_from_url(self, album_directory: str, image_url: str):
         response = requests.get(
             image_url,

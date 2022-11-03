@@ -38,8 +38,12 @@ class AudioService:
         audio = AudioSegment.from_file(song.source_file)
         audio.export(song.output_file, format="mp3", bitrate="320K")
 
+        found_image = None
+
         if song.cover:
-            libs.file.save_image(album_directory, song)
+            with open(f"{album_directory}\\cover.png", "wb") as data:
+                found_image = data
+                data.write(song.cover)
 
         mp3_outfile = libs.tag.tag(flac, song)
 
@@ -49,6 +53,7 @@ class AudioService:
 
             if not mp3_outfile.get("APIC", None):
                 with open(first_album_image.absolute(), "rb") as data:
+                    found_image = data
                     libs.tag.set_apic(mp3_outfile, data.read())
 
         if not (song.cover and first_album_image):
@@ -58,15 +63,18 @@ class AudioService:
                 libs.file.save_image_from_url(album_directory, cover)
 
                 with open(f"{album_directory}\\cover.jpeg", "rb") as data:
+                    found_image = data
                     libs.tag.set_apic(mp3_outfile, data.read())
 
         libs.song.process_song(song, is_processed=1)
 
-        session_album = libs.file.get_parent_path(song.output_file)
-        if (
-            session_album not in settings.session_albums
-        ):  # change to db model with albums
-            settings.session_albums.append(session_album)
+        libs.ftp.upload_song(song.output_file, found_image)
+
+        # session_album = libs.file.get_parent_path(song.output_file)
+        # if (
+        #     session_album not in settings.session_albums
+        # ):  # change to db model with albums
+        #     settings.session_albums.append(session_album)
 
         logger.info(f"{song.title} export successful")
 
@@ -100,9 +108,9 @@ class AudioService:
 
         await asyncio.gather(*futures)
 
-        if not disable_ftp:
-            for album in settings.session_albums:
-                libs.ftp.upload_files(album)
+        # if not disable_ftp:
+        #     for album in settings.session_albums:
+        #         libs.ftp.upload_files(album)
 
 
 audio = AudioService()

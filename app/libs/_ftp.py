@@ -3,7 +3,7 @@ from asyncio.log import logger
 from ftplib import FTP, error_perm
 from pathlib import Path
 
-from app import models
+from app import models, schemas
 from app.core import settings
 
 
@@ -18,6 +18,11 @@ class FtpWrapper:
         except Exception as e:
             logger.error(e)
             self.ftp = None
+
+        self.folders = []
+        if self.ftp:
+            self.ftp.cwd("/foobar2000 Music Folder")
+            self.folders.extend([folder for folder in self.ftp.nlst()])
 
     def upload_files(self, path: str):
         if not self.ftp:
@@ -48,6 +53,34 @@ class FtpWrapper:
 
                     if fp.suffix not in [".jpg", ".png", ".jpeg"]:
                         models.Song.update_upload_status(full_path, True)
+
+    def upload_song(self, path: str, found_image):
+        if not self.ftp:
+            logger.info("You need to start your FTP server")
+            return
+
+        self.ftp.cwd("/foobar2000 Music Folder")
+
+        p = Path(path)
+
+        if p.parent.name not in self.folders and os.path.isdir(p.parent.absolute()):
+            try:
+                self.ftp.mkd(p.parent.name)
+            except error_perm as e:
+                if e.args[0].startswith("550"):
+                    return
+                else:
+                    raise
+
+        self.ftp.cwd(p.parent.name)
+
+        with open(path, "rb") as f:
+            self.ftp.storbinary("STOR " + p.name, f)
+
+        if found_image:
+            self.ftp.storbinary("STOR cover.jpg", found_image)
+
+        models.Song.update_upload_status(path, True)
 
 
 ftp = FtpWrapper()
