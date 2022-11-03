@@ -8,6 +8,8 @@ from app import libs, models, schemas, services
 from app.core import logger
 from app.db import db
 
+db.create_tables([models.Library, models.Song, models.UploadedAlbum])
+
 app = typer.Typer()
 
 
@@ -16,8 +18,6 @@ def setup():
     """
     Setup the program, add libraries, output paths, etc
     """
-
-    db.create_tables([models.Library, models.Song])
 
     name = Prompt.ask("Library name")
     source_path = Prompt.ask("Library path")
@@ -50,13 +50,13 @@ def sync(
 
         songs = list(set(libs.file.get_song_files(library)) - set(processed_songs))
 
-        typer.echo(
-            asyncio.run(
-                services.audio.process_songs(
-                    library, songs, output_path, source_path, disable_ftp
-                )
-            )
+        asyncio.run(
+            services.audio.process_songs(library, songs, output_path, source_path)
         )
+
+    if not disable_ftp:
+        for album in models.UploadedAlbum.get_unuploaded_albums():
+            libs.ftp.upload_files(album.output_path)
 
 
 @app.command()
@@ -80,10 +80,10 @@ def full_sync(
     for library in libraries:
         songs = libs.file.get_song_files(library)
 
-        typer.echo(
-            asyncio.run(
-                services.audio.process_songs(
-                    library, songs, output_path, source_path, disable_ftp
-                )
-            )
+        asyncio.run(
+            services.audio.process_songs(library, songs, output_path, source_path)
         )
+
+    if not disable_ftp:
+        for album in models.UploadedAlbum.get_unuploaded_albums():
+            libs.ftp.upload_files(album.output_path)
