@@ -5,6 +5,7 @@ from pathlib import Path
 
 from app import models
 from app.core import settings
+from peewee import DoesNotExist
 
 
 class FtpWrapper:
@@ -46,8 +47,12 @@ class FtpWrapper:
 
                     self.ftp.storbinary("STOR " + f, open(full_path, "rb"))
 
-                    if fp.suffix not in [".jpg", ".png", ".jpeg"]:
-                        models.Song.update_upload_status(full_path, True)
+                    if fp.suffix in [".mp3"]:
+                        try:
+                            models.Song.update_upload_status(full_path, True)
+                        except DoesNotExist as e:
+                            logger.info(e)
+                            return
 
 
 ftp = FtpWrapper()
