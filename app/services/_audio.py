@@ -11,6 +11,8 @@ from app.core import logger, settings
 
 from peewee import DoesNotExist
 
+from pathlib import Path
+
 
 class AudioService:
     def export_audio(self, output_path: str, song_path: str):
@@ -62,11 +64,15 @@ class AudioService:
 
         libs.song.process_song(song, is_processed=1)
 
-        session_album = libs.file.get_parent_path(song.output_file)
-        if (
-            session_album not in settings.session_albums
-        ):  # change to db model with albums
-            settings.session_albums.append(session_album)
+        models.UploadedAlbum.get_or_create(
+            **{
+                "name": song.album,
+                "artist": song.artist,
+                "source_path": libs.file.get_parent_path(song.source_file),
+                "output_path": libs.file.get_parent_path(song.output_file),
+                "is_uploaded": 0,
+            }
+        )
 
         logger.info(f"{song.title} export successful")
 
@@ -76,7 +82,6 @@ class AudioService:
         songs: List[str] = None,
         output_path: Optional[str] = None,
         source_path: Optional[str] = None,
-        disable_ftp: bool = False,
     ):
         if not songs:
             songs = []
@@ -99,10 +104,6 @@ class AudioService:
             )
 
         await asyncio.gather(*futures)
-
-        if not disable_ftp:
-            for album in settings.session_albums:
-                libs.ftp.upload_files(album)
 
 
 audio = AudioService()
