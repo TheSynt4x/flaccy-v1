@@ -17,6 +17,9 @@ class DiscogsWrapper:
 
         results = results.page(1)
 
+        if not len(results):
+            return None
+
         images = [i for i in results[0].images]
 
         if not len(images):
