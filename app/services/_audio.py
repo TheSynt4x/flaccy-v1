@@ -61,13 +61,12 @@ class AudioService:
         libs.song.process_song(song, is_processed=1)
 
         try:
-            models.UploadedAlbum.get_by_output_path(
-                libs.file.get_parent_path(song.output_file)
-            )
+            models.Album.get_by_output_path(libs.file.get_parent_path(song.output_file))
         except DoesNotExist:
-            models.UploadedAlbum.create(
+            models.Album.create(
                 name=song.album,
                 artist=song.artist,
+                year=song.year,
                 source_path=libs.file.get_parent_path(song.source_file),
                 output_path=libs.file.get_parent_path(song.output_file),
                 is_uploaded=0,

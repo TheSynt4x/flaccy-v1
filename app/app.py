@@ -8,7 +8,7 @@ from app import libs, models, schemas, services
 from app.core import logger, settings
 from app.db import db
 
-db.create_tables([models.Library, models.Song, models.UploadedAlbum])
+db.create_tables([models.Library, models.Song, models.Album])
 
 app = typer.Typer()
 
@@ -57,7 +57,7 @@ def sync(
         asyncio.run(services.audio.process_songs(library, songs))
 
     if not settings.disable_ftp:
-        for album in models.UploadedAlbum.get_unuploaded_albums():
+        for album in models.Album.get_unuploaded_albums():
             libs.ftp.upload_files(album.output_path)
 
 
@@ -89,5 +89,5 @@ def full_sync(
         asyncio.run(services.audio.process_songs(library, songs))
 
     if not settings.disable_ftp:
-        for album in models.UploadedAlbum.get_unuploaded_albums():
+        for album in models.Album.get_unuploaded_albums():
             libs.ftp.upload_files(album.output_path)

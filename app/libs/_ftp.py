@@ -56,7 +56,7 @@ class FtpWrapper:
                             return
 
             try:
-                models.UploadedAlbum.update_upload_status(p, True)
+                models.Album.update_upload_status(p, True)
             except DoesNotExist as e:
                 logger.info(e)
                 return

@@ -5,30 +5,31 @@ from peewee import BooleanField, CharField, IntegerField
 from app.models.base import Base
 
 
-class UploadedAlbum(Base):
+class Album(Base):
     id = IntegerField(primary_key=True)
     artist = CharField()
     name = CharField()
+    year = CharField(null=True)
     source_path = CharField()
     output_path = CharField()
     is_uploaded = BooleanField()
 
     @classmethod
-    def all(cls: "UploadedAlbum") -> List["UploadedAlbum"]:
+    def all(cls: "Album") -> List["Album"]:
         return [album for album in cls.select().dicts()]
 
     @classmethod
-    def get_unuploaded_albums(cls: "UploadedAlbum"):
+    def get_unuploaded_albums(cls: "Album"):
         return cls.select().where(cls.is_uploaded is False)
 
     @classmethod
-    def get_by_output_path(cls: "UploadedAlbum", output_path: str) -> "UploadedAlbum":
+    def get_by_output_path(cls: "Album", output_path: str) -> "Album":
         return cls.select().where(cls.output_path == output_path).get()
 
     @classmethod
     def update_upload_status(
-        cls: "UploadedAlbum", output_path: str, is_uploaded: bool = False
-    ) -> "UploadedAlbum":
+        cls: "Album", output_path: str, is_uploaded: bool = False
+    ) -> "Album":
         s = cls.get_by_output_path(output_path)
 
         if not s:
