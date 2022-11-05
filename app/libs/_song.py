@@ -1,6 +1,9 @@
 from typing import Any, Dict, List, Optional, Tuple
 
+from mutagen import File
+from mutagen.easyid3 import EasyID3
 from mutagen.flac import FLAC
+from mutagen.mp3 import MP3
 
 from app import models, schemas
 
@@ -8,6 +11,14 @@ from app import models, schemas
 class SongWrapper:
     def _get_song_field(self, flac: FLAC, field_name: str) -> Optional[str]:
         return flac.get(field_name)[0] if len(flac.get(field_name, [])) else None
+
+    def _get_mutagen_object(self, song_path: str):
+        if song_path.endswith(".flac"):
+            return FLAC(song_path)
+        elif song_path.endswith(".mp3"):
+            return MP3(song_path, ID3=EasyID3)
+        else:
+            return File(song_path)
 
     def get_song_fields(
         self, flac: FLAC, field_names: List[str] = None
@@ -23,13 +34,17 @@ class SongWrapper:
         return fields
 
     def get_song_info(self, song_path: str) -> Tuple[schemas.Song, FLAC]:
-        flac = FLAC(song_path)
+        flac = self._get_mutagen_object(song_path)
 
         song = self.get_song_fields(
             flac, ["title", "albumartist", "originalyear", "artist", "album", "date"]
         )
 
-        art = flac.pictures[0].data if len(flac.pictures) else None
+        art = None
+        if "pictures" in flac:
+            art = flac.pictures[0].data if len(flac.pictures) else None
+        else:
+            art = flac.get("APIC")[0].data if len(flac.get("APIC", [])) else None
 
         return (
             schemas.Song(

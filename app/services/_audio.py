@@ -59,7 +59,7 @@ class AudioService:
             if cover:
                 libs.file.save_image_from_url(album_directory, cover)
 
-                with open(f"{album_directory}\\cover.jpeg", "rb") as data:
+                with open(f"{album_directory}\\cover.jpg", "rb") as data:
                     libs.tag.set_apic(mp3_outfile, data.read())
 
         libs.song.process_song(song, is_processed=1)
