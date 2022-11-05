@@ -20,7 +20,7 @@ class Album(Base):
 
     @classmethod
     def get_unuploaded_albums(cls: "Album"):
-        return cls.select().where(cls.is_uploaded is False)
+        return cls.select().where(cls.is_uploaded == 0)
 
     @classmethod
     def get_by_output_path(cls: "Album", output_path: str) -> "Album":
