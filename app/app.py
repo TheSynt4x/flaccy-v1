@@ -47,6 +47,9 @@ def sync(
     settings.override_output_path = output_path
     settings.disable_ftp = disable_ftp
 
+    if not settings.disable_ftp:
+        libs.ftp.connect()
+
     libraries = [schemas.Library(**library) for library in models.Library.all()]
 
     for library in libraries:
@@ -74,6 +77,9 @@ def full_sync(
     settings.override_source_path = source_path
     settings.override_output_path = output_path
     settings.disable_ftp = disable_ftp
+
+    if not settings.disable_ftp:
+        libs.ftp.connect()
 
     confirm = Confirm.ask("Are you sure you want to run a full sync?")
 

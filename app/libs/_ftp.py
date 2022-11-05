@@ -12,10 +12,15 @@ from app.core import settings
 class FtpWrapper:
     def __init__(self):
         server, port = settings.ftp_server.split(":")
+
+        self.server = server
+        self.port = int(port)
+
+    def connect(self):
         self.ftp = FTP()
 
         try:
-            self.ftp.connect(server, int(port))
+            self.ftp.connect(self.server, self.port)
             self.ftp.login(settings.ftp_username, settings.ftp_password)
         except Exception as e:
             logger.error(e)
