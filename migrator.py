@@ -16,12 +16,22 @@ def export_audio(output_path: str, song_path: str):
 
     libs.song.process_song(song, 1, 1)
 
+    models.Album.get_or_create(
+        name=song.album,
+        artist=song.artist,
+        year=song.year,
+        source_path=libs.file.get_parent_path(song.source_file),
+        output_path=libs.file.get_parent_path(song.output_file),
+        is_uploaded=1,
+    )
+
     logger.info(f"Processed {song.title}")
+    logger.info(f"creating {song.album}")
 
 
 async def migrator():
     loop = asyncio.get_running_loop()
-    executor = ThreadPoolExecutor(max_workers=2)
+    executor = ThreadPoolExecutor(max_workers=1)
 
     futures = []
 
