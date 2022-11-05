@@ -51,10 +51,9 @@ def sync(
         libs.ftp.connect()
 
     libraries = [schemas.Library(**library) for library in models.Library.all()]
+    processed_songs = [p.source_file for p in models.Song.get_processed_songs()]
 
     for library in libraries:
-        processed_songs = [p.source_file for p in models.Song.get_processed_songs()]
-
         songs = list(set(libs.file.get_song_files(library)) - set(processed_songs))
 
         asyncio.run(services.audio.process_songs(library, songs))
@@ -97,3 +96,24 @@ def full_sync(
     if not settings.disable_ftp:
         for album in models.Album.get_unuploaded_albums():
             libs.ftp.upload_files(album.output_path)
+
+
+@app.command()
+def db_diff(
+    output_path: Optional[str] = None,
+    source_path: Optional[str] = None,
+    disable_ftp: bool = False,
+):
+    settings.override_source_path = source_path
+    settings.override_output_path = output_path
+    settings.disable_ftp = disable_ftp
+
+    libraries = [schemas.Library(**library) for library in models.Library.all()]
+    processed_songs = [p.source_file for p in models.Song.get_processed_songs()]
+
+    songs = []
+
+    for library in libraries:
+        songs.extend(libs.file.get_song_files(library))
+
+    logger.info(f"songs in output: {len(songs)}, songs in db: {len(processed_songs)}")
