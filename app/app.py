@@ -104,6 +104,10 @@ def db_diff(
     source_path: Optional[str] = None,
     disable_ftp: bool = False,
 ):
+    """
+    Run a difference check between library and database
+    """
+
     settings.override_source_path = source_path
     settings.override_output_path = output_path
     settings.disable_ftp = disable_ftp
@@ -121,6 +125,10 @@ def db_diff(
 
 @app.command()
 def upload_albums():
+    """
+    Upload albums that haven't been uploaded.
+    """
+
     libs.ftp.connect()
 
     for album in models.Album.get_unuploaded_albums():
