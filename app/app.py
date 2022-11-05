@@ -1,4 +1,5 @@
 import asyncio
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 import typer
@@ -38,6 +39,7 @@ def sync(
     output_path: Optional[str] = None,
     source_path: Optional[str] = None,
     disable_ftp: bool = False,
+    force: bool = False,
 ):
     """
     Run a normal sync for all saved libraries.
@@ -46,6 +48,7 @@ def sync(
     settings.override_source_path = source_path
     settings.override_output_path = output_path
     settings.disable_ftp = disable_ftp
+    settings.force = force
 
     if not settings.disable_ftp:
         libs.ftp.connect()
@@ -55,6 +58,13 @@ def sync(
 
     for library in libraries:
         songs = list(set(libs.file.get_song_files(library)) - set(processed_songs))
+
+        if settings.override_output_path:
+            library.output_path = settings.override_output_path
+
+        if settings.override_source_path:
+            library.path = settings.override_source_path
+            songs = libs.file.get_song_files(library)
 
         asyncio.run(services.audio.process_songs(library, songs))
 
@@ -89,13 +99,33 @@ def full_sync(
     libraries = [schemas.Library(**library) for library in models.Library.all()]
 
     for library in libraries:
+        if settings.override_source_path:
+            library.path = settings.override_source_path
+
+        if settings.override_output_path:
+            library.output_path = settings.override_output_path
+
         songs = libs.file.get_song_files(library)
 
         asyncio.run(services.audio.process_songs(library, songs))
 
     if not settings.disable_ftp:
-        for album in models.Album.get_unuploaded_albums():
-            libs.ftp.upload_files(album.output_path)
+        with ThreadPoolExecutor() as executor:
+            futures = []
+
+            for album in models.Album.get_unuploaded_albums():
+                futures.append(
+                    executor.submit(libs.ftp.upload_files, album.output_path)
+                )
+
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception as e:
+                    logger.info(e)
+
+        logger.info(f"successful: {libs.ftp.success}")
+        logger.info(f"failed: {libs.ftp.failed}")
 
 
 @app.command()

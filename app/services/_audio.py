@@ -24,7 +24,11 @@ class AudioService:
         except DoesNotExist:
             db_song = None
 
-        if libs.file.export_exists(album_directory, song) and db_song:
+        if (
+            libs.file.export_exists(album_directory, song)
+            and db_song
+            and not settings.force
+        ):
             if not db_song.is_processed:
                 db_song.is_processed = True
                 db_song.save()
@@ -65,7 +69,12 @@ class AudioService:
         libs.song.process_song(song, is_processed=1)
 
         try:
-            models.Album.get_by_output_path(libs.file.get_parent_path(song.output_file))
+            album = models.Album.get_by_output_path(
+                libs.file.get_parent_path(song.output_file)
+            )
+
+            album.is_uploaded = 0
+            album.save()
         except DoesNotExist:
             models.Album.create(
                 name=song.album,
@@ -82,22 +91,16 @@ class AudioService:
         if not songs:
             songs = []
 
-        loop = asyncio.get_running_loop()
-        executor = ThreadPoolExecutor(max_workers=4)
         futures = []
+        loop = asyncio.get_running_loop()
 
-        if settings.override_output_path:
-            library.output_path = settings.override_output_path
-
-        if settings.override_source_path:
-            library.path = settings.override_source_path
-
-        for song in songs:
-            futures.append(
-                loop.run_in_executor(
-                    executor, partial(self.export_audio, library.output_path, song)
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            for song in songs:
+                futures.append(
+                    loop.run_in_executor(
+                        executor, partial(self.export_audio, library.output_path, song)
+                    )
                 )
-            )
 
         await asyncio.gather(*futures)
 

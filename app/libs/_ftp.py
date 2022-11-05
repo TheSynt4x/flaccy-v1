@@ -16,6 +16,9 @@ class FtpWrapper:
         self.server = server
         self.port = int(port)
 
+        self.success = []
+        self.failed = []
+
     def connect(self):
         self.ftp = FTP()
 
@@ -51,7 +54,15 @@ class FtpWrapper:
                     full_path = os.path.join(root, f)
                     fp = Path(full_path)
 
-                    self.ftp.storbinary("STOR " + f, open(full_path, "rb"))
+                    try:
+                        self.ftp.storbinary(
+                            "STOR " + f.replace("...", ""), open(full_path, "rb")
+                        )
+
+                        self.success.append(path)
+                    except error_perm as e:
+                        logger.info(e.args)
+                        self.failed.append(path)
 
                     if fp.suffix in [".mp3"]:
                         try:
