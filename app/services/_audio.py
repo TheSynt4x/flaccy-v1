@@ -49,7 +49,11 @@ class AudioService:
                 with open(first_album_image.absolute(), "rb") as data:
                     libs.tag.set_apic(mp3_outfile, data.read())
 
-        if not (song.cover and first_album_image):
+        if not (
+            song.cover
+            or first_album_image
+            or libs.file.get_first_image(song.output_file)
+        ):
             cover = libs.discogs.get_album_art(song)
 
             if cover:
