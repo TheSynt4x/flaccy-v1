@@ -117,3 +117,11 @@ def db_diff(
         songs.extend(libs.file.get_song_files(library))
 
     logger.info(f"songs in output: {len(songs)}, songs in db: {len(processed_songs)}")
+
+
+@app.command()
+def upload_albums():
+    libs.ftp.connect()
+
+    for album in models.Album.get_unuploaded_albums():
+        libs.ftp.upload_files(album.output_path)
