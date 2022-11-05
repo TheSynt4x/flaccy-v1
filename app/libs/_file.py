@@ -72,7 +72,7 @@ class FileWrapper:
         if not response.ok:
             return
 
-        with open(f"{album_directory}\\cover.jpeg", "wb") as f:
+        with open(f"{album_directory}\\cover.jpg", "wb") as f:
             f.write(response.content)
 
     def get_export_filename(self, album_directory: str, song: schemas.Song):
