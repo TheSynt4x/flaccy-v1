@@ -28,12 +28,12 @@ class AudioService:
             and db_song
             and not settings.force
         ):
+            if db_song.is_processed and db_song.is_uploaded:
+                return
+
             if not db_song.is_processed:
                 db_song.is_processed = True
                 db_song.save()
-                return
-
-            if db_song.is_uploaded:
                 return
 
         audio = AudioSegment.from_file(song.source_file)

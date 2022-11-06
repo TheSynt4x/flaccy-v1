@@ -34,4 +34,4 @@ class Song(Base):
 
     @classmethod
     def get_processed_songs(cls: "Song"):
-        return cls.select().where(cls.is_processed == 1)
+        return cls.select().where((cls.is_processed == 1) & (cls.is_uploaded == 1))
