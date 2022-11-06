@@ -22,9 +22,13 @@ class FtpWrapper:
     def connect(self):
         self.ftp = FTP()
 
+        self.ftp.encoding = "utf-8"
+
         try:
             self.ftp.connect(self.server, self.port)
             self.ftp.login(settings.ftp_username, settings.ftp_password)
+
+            self.ftp.sendcmd("OPTS UTF8 ON")
         except Exception as e:
             logger.error(e)
             self.ftp = None
