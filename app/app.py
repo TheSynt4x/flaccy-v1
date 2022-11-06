@@ -1,5 +1,3 @@
-import asyncio
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 
 import typer
@@ -59,18 +57,17 @@ def sync(
     for library in libraries:
         songs = list(set(libs.file.get_song_files(library)) - set(processed_songs))
 
-        if settings.override_output_path:
-            library.output_path = settings.override_output_path
+        if output_path:
+            library.output_path = output_path
 
-        if settings.override_source_path:
-            library.path = settings.override_source_path
+        if source_path:
+            library.path = source_path
             songs = libs.file.get_song_files(library)
 
-        asyncio.run(services.audio.process_songs(library, songs))
+        services.audio.process_songs(library, songs)
 
     if not settings.disable_ftp:
-        for album in models.Album.get_unuploaded_albums():
-            libs.ftp.upload_files(album.output_path)
+        services.audio.upload_albums(models.Album.get_unuploaded_albums())
 
 
 @app.command()
@@ -107,25 +104,10 @@ def full_sync(
 
         songs = libs.file.get_song_files(library)
 
-        asyncio.run(services.audio.process_songs(library, songs))
+        services.audio.process_songs(library, songs)
 
     if not settings.disable_ftp:
-        with ThreadPoolExecutor() as executor:
-            futures = []
-
-            for album in models.Album.get_unuploaded_albums():
-                futures.append(
-                    executor.submit(libs.ftp.upload_files, album.output_path)
-                )
-
-            for future in as_completed(futures):
-                try:
-                    future.result()
-                except Exception as e:
-                    logger.info(e)
-
-        logger.info(f"successful: {libs.ftp.success}")
-        logger.info(f"failed: {libs.ftp.failed}")
+        services.audio.upload_albums(models.Album.get_unuploaded_albums())
 
 
 @app.command()

@@ -41,10 +41,8 @@ class SongWrapper:
         )
 
         art = None
-        if "pictures" in flac:
-            art = flac.pictures[0].data if len(flac.pictures) else None
-        else:
-            art = flac.get("APIC")[0].data if len(flac.get("APIC", [])) else None
+        if getattr(flac, "pictures", []):
+            art = flac.pictures[0].data
 
         return (
             schemas.Song(

@@ -1,7 +1,7 @@
 import discogs_client
 
 from app import schemas
-from app.core import settings
+from app.core import logger, settings
 
 
 class DiscogsWrapper:
@@ -13,14 +13,16 @@ class DiscogsWrapper:
     def get_album_art(self, song: schemas.Song):
         results = self.client.search(song.album, song.artist)
 
-        r = results.page(1)
+        results = results.page(0)
 
-        images = [i for i in r[0].images if "images" in r[0]] if len(r) > 0 else []
+        if len(results or []):
+            if len(results[0].images or []):
+                if "uri" in results[0].images[0]:
+                    logger.info("Downloading from discogs")
 
-        if not len(images):
-            return None
+                    return results[0].images[0]["uri"]
 
-        return images[0]["uri"]
+        return None
 
 
 discogs = DiscogsWrapper()

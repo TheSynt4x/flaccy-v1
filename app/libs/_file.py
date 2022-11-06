@@ -84,7 +84,7 @@ class FileWrapper:
     def copy_cover(self, album_directory: str, first_album_image: Path):
         shutil.copy(
             first_album_image.absolute(),
-            os.path.join(album_directory, first_album_image.name),
+            os.path.join(album_directory, f"cover{first_album_image.suffix}"),
         )
 
 

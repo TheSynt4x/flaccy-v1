@@ -1,6 +1,5 @@
-import asyncio
+from concurrent.futures import as_completed
 from concurrent.futures.thread import ThreadPoolExecutor
-from functools import partial
 from typing import List
 
 from peewee import DoesNotExist
@@ -56,7 +55,7 @@ class AudioService:
         if not (
             song.cover
             or first_album_image
-            or libs.file.get_first_image(song.output_file)
+            and libs.file.get_first_image(song.output_file)
         ):
             cover = libs.discogs.get_album_art(song)
 
@@ -87,22 +86,32 @@ class AudioService:
 
         logger.info(f"{song.title} export successful")
 
-    async def process_songs(self, library: schemas.Library, songs: List[str] = None):
+    def process_songs(self, library: schemas.Library, songs: List[str] = None):
         if not songs:
             songs = []
 
-        futures = []
-        loop = asyncio.get_running_loop()
-
         with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = []
+
             for song in songs:
                 futures.append(
-                    loop.run_in_executor(
-                        executor, partial(self.export_audio, library.output_path, song)
-                    )
+                    executor.submit(self.export_audio, library.output_path, song)
                 )
 
-        await asyncio.gather(*futures)
+            for future in as_completed(futures):
+                future.result()
+
+    def upload_albums(self, albums):
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            futures = []
+
+            for album in albums:
+                futures.append(
+                    executor.submit(libs.ftp.upload_files, album.output_path)
+                )
+
+            for future in as_completed(futures):
+                future.result()
 
 
 audio = AudioService()
