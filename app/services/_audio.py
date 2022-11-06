@@ -34,7 +34,6 @@ class AudioService:
             if not db_song.is_processed:
                 db_song.is_processed = True
                 db_song.save()
-                return
 
         audio = AudioSegment.from_file(song.source_file)
         audio.export(song.output_file, format="mp3", bitrate="320K")
