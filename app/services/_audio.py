@@ -102,16 +102,10 @@ class AudioService:
                 future.result()
 
     def upload_albums(self, albums):
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = []
+        libs.ftp.connect()
 
-            for album in albums:
-                futures.append(
-                    executor.submit(libs.ftp.upload_files, album.output_path)
-                )
-
-            for future in as_completed(futures):
-                future.result()
+        for album in albums:
+            libs.ftp.upload_files(album.output_path)
 
 
 audio = AudioService()
