@@ -38,10 +38,18 @@ def sync(
     source_path: Optional[str] = None,
     disable_ftp: bool = False,
     force: bool = False,
+    full: bool = False,
 ):
     """
     Run a normal sync for all saved libraries.
     """
+
+    if full:
+        confirm = Confirm.ask("Are you sure you want to run a full sync?")
+
+        if not confirm:
+            logger.info("Not running a full sync")
+            raise typer.Abort()
 
     settings.override_source_path = source_path
     settings.override_output_path = output_path
@@ -64,45 +72,8 @@ def sync(
             library.path = source_path
             songs = libs.file.get_song_files(library)
 
-        services.audio.process_songs(library, songs)
-
-    if not settings.disable_ftp:
-        services.audio.upload_albums(models.Album.get_unuploaded_albums())
-
-
-@app.command()
-def full_sync(
-    output_path: Optional[str] = None,
-    source_path: Optional[str] = None,
-    disable_ftp: bool = False,
-):
-    """
-    Run a full sync for all saved libraries.
-    """
-
-    settings.override_source_path = source_path
-    settings.override_output_path = output_path
-    settings.disable_ftp = disable_ftp
-
-    if not settings.disable_ftp:
-        libs.ftp.connect()
-
-    confirm = Confirm.ask("Are you sure you want to run a full sync?")
-
-    if not confirm:
-        logger.info("Not running a full sync")
-        raise typer.Abort()
-
-    libraries = [schemas.Library(**library) for library in models.Library.all()]
-
-    for library in libraries:
-        if settings.override_source_path:
-            library.path = settings.override_source_path
-
-        if settings.override_output_path:
-            library.output_path = settings.override_output_path
-
-        songs = libs.file.get_song_files(library)
+        if full:
+            songs = libs.file.get_song_files(library)
 
         services.audio.process_songs(library, songs)
 
