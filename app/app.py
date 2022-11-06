@@ -68,11 +68,8 @@ def sync(
         if output_path:
             library.output_path = output_path
 
-        if source_path:
+        if source_path or full:
             library.path = source_path
-            songs = libs.file.get_song_files(library)
-
-        if full:
             songs = libs.file.get_song_files(library)
 
         services.audio.process_songs(library, songs)
