@@ -13,6 +13,10 @@ class AudioService:
     def export_audio(self, output_path: str, song_path: str):
         song, flac = libs.song.get_song_info(song_path)
 
+        if not song.artist or not song.album:
+            logger.info(f"invalid file: {song_path}")
+            return
+
         album_directory = libs.file.get_album_directory(output_path, song)
 
         song.source_file = song_path

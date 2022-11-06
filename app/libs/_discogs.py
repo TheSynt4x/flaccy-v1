@@ -11,6 +11,9 @@ class DiscogsWrapper:
         )
 
     def get_album_art(self, song: schemas.Song):
+        if not song.album or not song.artist:
+            return
+
         results = self.client.search(song.album, song.artist)
 
         results = results.page(0)
