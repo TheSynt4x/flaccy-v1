@@ -10,3 +10,6 @@ flaccy.db
 *.db
 logs/*.txt
 logs/*.log
+
+*.egg-info
+requirements.txt
