@@ -10,7 +10,7 @@ setuptools.setup(
     install_requires=requirements,
     entry_points={
         "console_scripts": [
-            "flaccy = main:app",
+            "flaccy = app.app:app",
         ],
     },
     include_package_data=True,
