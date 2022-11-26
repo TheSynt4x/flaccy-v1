@@ -15,7 +15,7 @@ if is_admin:
     if not os.path.exists("C:\\ffmpeg"):
         try:
             from tools import install_ffmpeg  # noqa
-        except Exception as e:
+        except Exception as e:  # noqa
             pass
 
 if __name__ == "__main__":
