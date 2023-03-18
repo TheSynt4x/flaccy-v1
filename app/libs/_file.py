@@ -43,7 +43,7 @@ class FileWrapper:
             output_path, clean_filename(f"{song.artist} - {song.album}")
         )
 
-        if song.year:
+        if song.year and "Z" not in song.year:
             album_directory += f" ({song.year})"
 
         Path(album_directory).mkdir(parents=True, exist_ok=True)

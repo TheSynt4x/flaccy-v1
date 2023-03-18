@@ -7,6 +7,7 @@ from peewee import DoesNotExist
 
 from app import models
 from app.core import settings
+from app.utils import clean_filename
 
 
 class FtpWrapper:
@@ -58,7 +59,9 @@ class FtpWrapper:
                     full_path = os.path.join(root, f)
                     fp = Path(full_path)
 
-                    self.ftp.storbinary("STOR " + f, open(full_path, "rb"))
+                    self.ftp.storbinary(
+                        "STOR " + clean_filename(f).strip(), open(full_path, "rb")
+                    )
 
                     if fp.suffix in [".mp3"]:
                         try:

@@ -18,7 +18,7 @@ class SongWrapper:
         elif song_path.endswith(".mp3"):
             return MP3(song_path, ID3=EasyID3)
         else:
-            return File(song_path)
+            return File(song_path, easy=True)
 
     def get_song_fields(
         self, flac: FLAC, field_names: List[str] = None
