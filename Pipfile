@@ -11,6 +11,8 @@ peewee = "*"
 python3-discogs-client = "*"
 requests = "*"
 typer = {extras = ["all"], version = "*"}
+fastapi = "*"
+uvicorn = {extras = ["standard"], version = "*"}
 
 [dev-packages]
 black = "*"
