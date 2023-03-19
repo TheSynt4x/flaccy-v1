@@ -24,3 +24,8 @@ app.add_middleware(
 @app.get("/api/libraries")
 def get_libraries():
     return {"libraries": models.Library.all()}
+
+
+@app.get("/api/songs")
+def get_songs():
+    return {"songs": models.Song.all()}
