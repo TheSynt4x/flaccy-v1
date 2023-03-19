@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import Modal from '@/components/Modal.vue';
 import {ref} from 'vue';
 

@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import { ref, watchEffect, defineProps, defineEmits } from 'vue';
+<script setup>
+import { ref, watchEffect } from 'vue';
 
 const props = defineProps({
     modelValue: {

@@ -3,17 +3,6 @@ import {createRouter, createWebHistory} from 'vue-router';
 import Libraries from '@/views/Libraries.vue'
 import Songs from '@/views/Songs.vue';
 
-export interface RouteMeta {
-    title: string;
-    icon: string;
-    inNavbar: boolean;
-}
-
-export interface Route {
-    path: string;
-    meta: RouteMeta;
-}
-
 export const routes = [
     { 
         path: '/', 

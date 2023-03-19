@@ -1,14 +1,11 @@
-<script setup lang="ts">
-import type { ComputedRef, Ref } from 'vue';
-import type { Route } from '@/plugins/router';
-
+<script setup>
 import { ref, computed } from 'vue';
 
 import { routes } from '@/plugins/router';
 
-let drawer: Ref = ref(true);
+let drawer = ref(true);
 
-let filteredRoutes: ComputedRef<Array<Route>> = computed(() => {
+let filteredRoutes = computed(() => {
   return routes.filter(route => route.meta?.inNavbar);
 })
 </script>
@@ -41,7 +38,8 @@ let filteredRoutes: ComputedRef<Array<Route>> = computed(() => {
   margin-inline-start: 0 !important;
 }
 
-.v-input__prepend, .v-input__append {
+.v-input__prepend,
+.v-input__append {
   padding-top: 0 !important;
 }
 </style>

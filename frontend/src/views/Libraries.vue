@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import Table from '@/components/Table.vue';
 
 import { ref, onMounted } from 'vue'
@@ -16,10 +16,10 @@ let headers = ref([{
 }, {
     title: 'Formats',
     key: 'formats',
-}] as Array<{ title: string, key: string }>);
+}]);
 
-let libraries = ref([] as Array<{ name: string, path: string, output_path: string, formats: string }>);
-let itemsPerPage = 5;
+let libraries = ref([]);
+let itemsPerPage = ref(5);
 
 let search = ref('');
 
