@@ -29,7 +29,7 @@ watchEffect(() => {
 <template>
     <v-text-field v-model="search" label="Search..." density="compact">
         <template #append v-if="filters?.length">
-            lol
+            
         </template>
     </v-text-field>
 </template>
