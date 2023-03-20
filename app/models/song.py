@@ -15,6 +15,10 @@ class Song(Base):
     output_file = CharField()
 
     @classmethod
+    def all(cls: "Song") -> "Song":
+        return [song for song in cls.select().dicts()]
+
+    @classmethod
     def get_by_output_file(cls: "Song", output_file: str) -> "Song":
         return cls.select().where(cls.output_file == output_file).get()
 

@@ -1,3 +1,4 @@
+import subprocess
 from typing import Optional
 
 import typer
@@ -113,3 +114,12 @@ def upload_albums():
 
     for album in models.Album.get_unuploaded_albums():
         libs.ftp.upload_files(album.output_path)
+
+
+@app.command()
+def server():
+    """
+    Run the server and frontend for managing flaccy
+    """
+    subprocess.Popen("uvicorn app.api:app", shell=True)
+    subprocess.Popen("npm run dev", shell=True, cwd="frontend")
