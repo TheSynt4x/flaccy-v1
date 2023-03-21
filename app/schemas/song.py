@@ -1,9 +1,9 @@
-from typing import Any, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
 
-class Song(BaseModel):
+class BaseSong(BaseModel):
     title: Optional[str] = None
     artist: Optional[str] = None
     album: Optional[str] = None
@@ -14,3 +14,12 @@ class Song(BaseModel):
 
     class Config:
         orm_mode: bool = True
+
+
+class Song(BaseSong):
+    id: int
+
+
+class Songs(BaseModel):
+    songs: List[Song] = []
+    total_count: int = 0

@@ -1,7 +1,9 @@
-from app.schemas.library import Library
-from app.schemas.song import Song
+from app.schemas.library import Libraries, Library
+from app.schemas.song import Song, Songs
 
 __all__ = [
     "Song",
+    "Songs",
     "Library",
+    "Libraries",
 ]

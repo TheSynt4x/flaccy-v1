@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from app import models
+from app import models, schemas
 from app.core import logger
 from app.db import db
 
@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 
-@app.get("/api/libraries")
+@app.get("/api/libraries", response_model=schemas.Libraries)
 def get_libraries(
     page: Optional[int] = 1,
     name: Optional[str] = None,
@@ -38,15 +38,17 @@ def get_libraries(
     if formats:
         query = query.where(models.Library.formats.contains(",".join(formats)))
 
+    total_count = query.count()
     query = query.paginate(page, 10)
 
-    return {"libraries": [q for q in query]}
+    return {"libraries": [q for q in query], "total_count": total_count}
 
 
-@app.get("/api/songs")
+@app.get("/api/songs", response_model=schemas.Songs)
 def get_songs(
     page: int = 1,
-    name: Optional[str] = None,
+    q: Optional[str] = None,
+    sort: List[str] = [],
     artist: Optional[str] = None,
     album: Optional[str] = None,
     year: Optional[int] = None,
@@ -54,8 +56,13 @@ def get_songs(
 ):
     query = models.Song.select()
 
-    if name:
-        query = query.where(models.Song.name.contains(name))
+    if q:
+        query = query.where(
+            models.Song.title.contains(q)
+            | models.Song.artist.contains(q)
+            | models.Song.album.contains(q)
+            | models.Song.year.contains(q)
+        )
 
     if artist:
         query = query.where(models.Song.artist.contains(artist))
@@ -69,9 +76,19 @@ def get_songs(
     if is_processed is not None:
         query = query.where(models.Song.is_processed == is_processed)
 
+    if sort:
+        for sort in sort:
+            key, order = sort.split(".")
+
+            if order == "asc":
+                query = query.order_by(models.Song[key].asc())
+            elif order == "desc":
+                query = query.order_by(models.Song[key].desc())
+
+    total_count = query.count()
     query = query.paginate(page, 10)
 
-    return {"songs": [q for q in query]}
+    return {"songs": [q for q in query], "total_count": total_count}
 
 
 @app.websocket("/ws")

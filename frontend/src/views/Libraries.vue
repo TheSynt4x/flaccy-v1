@@ -1,6 +1,4 @@
 <script setup>
-import Table from '@/components/Table.vue';
-
 import { ref, onMounted, computed } from 'vue'
 import CreateLibraryModal from '@/components/CreateLibraryModal.vue';
 
