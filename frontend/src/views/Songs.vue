@@ -19,9 +19,13 @@ let currentPage = ref(1);
 
 let filters = [];
 
-async function load(search, sortBy) {
-    if (search && search.length > 0) {
-        filters.push(['q', search]);
+async function load(q, sortBy) {
+    if (filters.find(f => f[0] === 'q')) {
+        filters = filters.filter(f => f[0] !== 'q');
+    }
+
+    if (q && q.length > 0) {
+        filters.push(['q', q]);
     }
 
     if (sortBy && sortBy.length > 0) {
@@ -29,14 +33,11 @@ async function load(search, sortBy) {
             if (filters.find(f => f[0] === 'sort')) {
                 filters = filters.filter(f => f[0] !== 'sort');
             }
-
-            filters.push(['sort', `${sort.key}.${sort.order}`])
+            if (sort.key && sort.order) {
+                filters.push(['sort', `${sort.key}.${sort.order}`])
+            }
         }
     }
-
-    console.log(filters);
-
-    // &sortBy=artist.asc&sortBy=title.asc
 
     await songStore.fetchSongs(currentPage.value, filters);
 }
@@ -61,7 +62,7 @@ watch(search, () => {
     debounce(async () => {
         currentPage.value = 1;
 
-        await load(search.value);
+        await load(search.value, filters);
 
         isLoading.value = false;
     }, 2000)();
