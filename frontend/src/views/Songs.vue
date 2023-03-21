@@ -17,12 +17,10 @@ let headers = ref([
 
 let currentPage = ref(1);
 
-let filters = [];
+let allFilters = [];
 
 async function load(q, sortBy) {
-    if (filters.find(f => f[0] === 'q')) {
-        filters = filters.filter(f => f[0] !== 'q');
-    }
+    let filters = [];
 
     if (q && q.length > 0) {
         filters.push(['q', q]);
@@ -30,22 +28,23 @@ async function load(q, sortBy) {
 
     if (sortBy && sortBy.length > 0) {
         for (const sort of sortBy) {
-            if (filters.find(f => f[0] === 'sort')) {
-                filters = filters.filter(f => f[0] !== 'sort');
-            }
             if (sort.key && sort.order) {
                 filters.push(['sort', `${sort.key}.${sort.order}`])
             }
         }
     }
 
+    filters.push(['per_page', itemsPerPage.value]);
+
     await songStore.fetchSongs(currentPage.value, filters);
+
+    allFilters = filters;
 }
 
 async function loadItems(p) {
     currentPage.value = p.page;
 
-    await load(search.value, p.sortBy);
+    await load(search.value, p.sortBy, itemsPerPage.value);
 }
 
 let itemsPerPage = ref(10);
@@ -62,7 +61,7 @@ watch(search, () => {
     debounce(async () => {
         currentPage.value = 1;
 
-        await load(search.value, filters);
+        await load(search.value, allFilters, itemsPerPage.value);
 
         isLoading.value = false;
     }, 2000)();

@@ -1,3 +1,4 @@
+from operator import attrgetter
 from typing import List, Optional
 
 from fastapi import FastAPI, Query
@@ -27,8 +28,10 @@ app.add_middleware(
 @app.get("/api/libraries", response_model=schemas.Libraries)
 def get_libraries(
     page: Optional[int] = 1,
+    per_page: Optional[int] = 10,
     name: Optional[str] = None,
     formats: List[str] = Query(None, description="List of formats"),
+    sorts: List[str] = Query(None, description="List of sort params"),
 ):
     query = models.Library.select()
 
@@ -38,21 +41,30 @@ def get_libraries(
     if formats:
         query = query.where(models.Library.formats.contains(",".join(formats)))
 
+    if sorts:
+        for sort in sorts:
+            key, order = sort.split(".")
+
+            if order == "asc":
+                query = query.order_by(attrgetter(key)(models.Song).asc())
+            elif order == "desc":
+                query = query.order_by(attrgetter(key)(models.Song).desc())
+
     total_count = query.count()
-    query = query.paginate(page, 10)
+    if per_page <= 0:
+        per_page = total_count
+
+    query = query.paginate(page, per_page)
 
     return {"libraries": [q for q in query], "total_count": total_count}
 
 
 @app.get("/api/songs", response_model=schemas.Songs)
 def get_songs(
-    page: int = 1,
+    page: Optional[int] = 1,
+    per_page: Optional[int] = 10,
     q: Optional[str] = None,
-    sort: List[str] = [],
-    artist: Optional[str] = None,
-    album: Optional[str] = None,
-    year: Optional[int] = None,
-    is_processed: Optional[bool] = None,
+    sorts: List[str] = Query(None, description="List of sort params"),
 ):
     query = models.Song.select()
 
@@ -64,29 +76,20 @@ def get_songs(
             | models.Song.year.contains(q)
         )
 
-    if artist:
-        query = query.where(models.Song.artist.contains(artist))
-
-    if album:
-        query = query.where(models.Song.album.contains(album))
-
-    if year:
-        query = query.where(models.Song.year == year)
-
-    if is_processed is not None:
-        query = query.where(models.Song.is_processed == is_processed)
-
-    if sort:
-        for sort in sort:
+    if sorts:
+        for sort in sorts:
             key, order = sort.split(".")
 
             if order == "asc":
-                query = query.order_by(models.Song[key].asc())
+                query = query.order_by(attrgetter(key)(models.Song).asc())
             elif order == "desc":
-                query = query.order_by(models.Song[key].desc())
+                query = query.order_by(attrgetter(key)(models.Song).desc())
 
     total_count = query.count()
-    query = query.paginate(page, 10)
+    if per_page <= 0:
+        per_page = total_count
+
+    query = query.paginate(page, per_page)
 
     return {"songs": [q for q in query], "total_count": total_count}
 
