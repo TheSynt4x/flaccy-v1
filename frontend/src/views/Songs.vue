@@ -2,6 +2,10 @@
 import Table from '@/components/Table.vue';
 import { ref, onMounted } from 'vue'
 
+import { useSongStore } from '@/store/songs';
+
+const songStore = useSongStore();
+
 let headers = ref([
     { title: 'Artist', key: 'artist' },
     { title: 'Title', key: 'title' },
@@ -9,17 +13,12 @@ let headers = ref([
     { title: 'Year', key: 'year' },
 ]);
 
-let songs = ref([]);
 let itemsPerPage = ref(10);
 
 let search = ref('');
 
-onMounted(() => {
-    fetch('http://localhost:8000/api/songs')
-        .then(response => response.json())
-        .then(data => {
-            songs.value = data.songs;
-        });
+onMounted(async () => {
+    await songStore.fetchSongs();
 });
 </script>
 
@@ -27,7 +26,6 @@ onMounted(() => {
     <div>
         <h1>Songs</h1>
 
-        lol
-        <Table v-model:search="search" :items-per-page="itemsPerPage" :headers="headers" :items="songs"></Table>
+        <Table v-model:search="search" :items-per-page="itemsPerPage" :headers="headers" :items="songStore.allSongs"></Table>
     </div>
 </template>

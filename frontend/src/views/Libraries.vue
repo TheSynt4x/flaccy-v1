@@ -1,8 +1,12 @@
 <script setup>
 import Table from '@/components/Table.vue';
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import CreateLibraryModal from '@/components/CreateLibraryModal.vue';
+
+import { useLibraryStore } from '@/store/libraries';
+
+const libraryStore = useLibraryStore();
 
 let headers = ref([{
     title: 'Name',
@@ -18,33 +22,22 @@ let headers = ref([{
     key: 'formats',
 }]);
 
-let libraries = ref([]);
 let itemsPerPage = ref(5);
 
 let search = ref('');
 
-let isLibraryLoading = ref(false);
+let formatFilter = ref([]);
 
-async function getLibraries() {
-    try {
-        isLibraryLoading.value = true;
+const filteredLibraries = computed(() => {
+    if (!formatFilter.value.length) return libraryStore.allLibraries;
 
-        const response = await fetch('http://localhost:8000/api/libraries');
-
-        if (!response.ok) {
-            throw new Error(response.statusText);
-        }
-
-        const data = await response.json();
-
-        libraries.value = data.libraries;
-    } finally {
-        isLibraryLoading.value = false;
-    }
-}
+    return libraryStore.allLibraries.filter(library => {
+        return formatFilter.value.every(format => library.formats.includes(format));
+    });
+});
 
 onMounted(async () => {
-    await getLibraries();
+    await libraryStore.fetchLibraries();
 });
 </script>
 
@@ -56,6 +49,14 @@ onMounted(async () => {
             <CreateLibraryModal />
         </div>
 
-        <Table v-model:search="search" :items-per-page="itemsPerPage" :headers="headers" :items="libraries" :loading="isLibraryLoading"></Table>
+        <Table v-model:search="search" :items-per-page="itemsPerPage" :headers="headers" :items="filteredLibraries"
+            :hasFilters="true">
+            <template #filters>
+                <div style="flex-grow: 1;">
+                    <v-select v-model="formatFilter" label="Formats" :items="['.mp3', '.flac', '.m4a']" multiple chips />
+                </div>
+            </template>
+        </Table>
+
     </div>
 </template>

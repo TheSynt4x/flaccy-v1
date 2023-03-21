@@ -1,8 +1,9 @@
 <script setup>
 import Modal from '@/components/Modal.vue';
-import {ref} from 'vue';
+import { ref } from 'vue';
 
 let isOpened = ref(false);
+let isFormValid = ref(false);
 </script>
 
 <template>
@@ -11,16 +12,27 @@ let isOpened = ref(false);
             <v-btn color="primary" @click="onClick">Create a library</v-btn>
         </template>
 
-        <v-form>
-            <v-text-field label="Name" density="compact"></v-text-field>
-            <v-text-field label="Path" density="compact"></v-text-field>
-            <v-text-field label="Output Path" density="compact"></v-text-field>
-            <v-select label="Formats" density="compact" multiple chips
+        <v-form v-model="isFormValid">
+            <v-text-field :rules="[
+                v => !!v || 'Name is required',
+            ]" label="Name" density="compact" />
+            <v-text-field :rules="[
+                v => !!v || 'Path is required',
+            ]" label="Path" density="compact" />
+
+            <v-text-field :rules="[
+                v => !!v || 'Output Path is required',
+            ]" label="Output Path" density="compact" />
+
+            <v-select :rules="[
+                v => v && v.length || 'Formats is required',
+
+            ]" label="Formats" density="compact" multiple chips
                 :items="[{ title: 'FLAC', value: '.flac' }, { title: 'MP3', value: '.mp3' }, { title: 'M4A', value: '.m4a' }]"></v-select>
         </v-form>
 
         <template #actions>
-            <v-btn variant="flat" color="primary">Create</v-btn>
+            <v-btn variant="flat" color="primary" :disabled="!isFormValid">Create</v-btn>
         </template>
     </Modal>
 </template>

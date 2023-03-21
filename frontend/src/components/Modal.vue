@@ -13,8 +13,6 @@ const emit = defineEmits(['update:modelValue']);
 let isOpened = ref(props.modelValue);
 
 function open() {
-    console.log('here')
-
     isOpened.value = true;
     emit('update:modelValue', isOpened.value);
 }
@@ -41,7 +39,7 @@ watchEffect(() => {
             </v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="close">Close Dialog</v-btn>
+                <v-btn color="primary" @click="close">Close</v-btn>
 
                 <slot name="actions"></slot>
             </v-card-actions>
