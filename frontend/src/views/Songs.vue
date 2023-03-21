@@ -19,9 +19,9 @@ let currentPage = ref(1);
 
 let filters = [];
 
-async function load(page = 1, search, sortBy) {
+async function load(search, sortBy) {
     if (search && search.length > 0) {
-        filters.push(['search', search]);
+        filters.push(['q', search]);
     }
 
     if (sortBy && sortBy.length > 0) {
@@ -38,13 +38,13 @@ async function load(page = 1, search, sortBy) {
 
     // &sortBy=artist.asc&sortBy=title.asc
 
-    await songStore.fetchSongs(page, filters);
+    await songStore.fetchSongs(currentPage.value, filters);
 }
 
 async function loadItems(p) {
     currentPage.value = p.page;
 
-    await load(currentPage.value, search.value, p.sortBy);
+    await load(search.value, p.sortBy);
 }
 
 let itemsPerPage = ref(10);
