@@ -29,7 +29,7 @@ async function load(q, sortBy) {
     if (sortBy && sortBy.length > 0) {
         for (const sort of sortBy) {
             if (sort.key && sort.order) {
-                filters.push(['sort', `${sort.key}.${sort.order}`])
+                filters.push(['sorts', `${sort.key}.${sort.order}`])
             }
         }
     }
@@ -44,7 +44,9 @@ async function load(q, sortBy) {
 async function loadItems(p) {
     currentPage.value = p.page;
 
-    await load(search.value, p.sortBy, itemsPerPage.value);
+    console.log(p.sortBy)
+
+    await load(search.value, p.sortBy);
 }
 
 let itemsPerPage = ref(10);
