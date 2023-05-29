@@ -5,12 +5,13 @@ import * as directives from 'vuetify/directives'
 
 import '@mdi/font/css/materialdesignicons.css'
 
-import { VDataTableServer } from 'vuetify/labs/VDataTable'
+import { VDataTableServer, VDataTable } from 'vuetify/labs/VDataTable'
 
 const vuetify = createVuetify({
   components: {
     ...components,
-    VDataTableServer
+    VDataTableServer,
+    VDataTable,
   },
   directives,
 })
