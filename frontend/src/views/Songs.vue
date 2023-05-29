@@ -17,8 +17,6 @@ let headers = ref([
 
 let currentPage = ref(1);
 
-let allFilters = [];
-
 let itemsPerPage = ref(10);
 
 let search = ref('');
@@ -98,19 +96,18 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div>
-        <h1>Songs</h1>
+    <h1>Songs</h1>
 
-        <v-text-field v-model="search" label="Search..." density="compact" class="ma-0">
-            <template #append>
-                <v-btn icon variant="plain" @click="hasFilters = true">
-                    <v-icon icon="mdi-filter"></v-icon>
-                </v-btn>
-            </template>
-        </v-text-field>
+    <v-text-field v-model="search" label="Search..." density="compact" class="ma-0" />
 
-        <v-data-table-server v-model:items-per-page="itemsPerPage" v-model:search="search" :headers="headers"
-            :items-length="songStore.total" :items="songStore.songsPerPage" :loading="isLoading" class="elevation-1"
-            item-title="name" item-value="name" @update:options="debouncedLoadItems"></v-data-table-server>
-    </div>
+    <v-data-table-server v-model:items-per-page="itemsPerPage" v-model:search="search" :headers="headers"
+        :items-length="songStore.total" :items="songStore.songsPerPage" :loading="isLoading" class="elevation-1"
+        item-title="name" item-value="name" @update:options="debouncedLoadItems"></v-data-table-server>
+
+    <v-tooltip position="top" text="Run song sync">
+        <template #activator="{ props }">
+            <v-btn color="primary" v-bind="props" style="position: absolute; bottom: 1rem; right: 1rem;"
+                icon="mdi-refresh"></v-btn>
+        </template>
+    </v-tooltip>
 </template>
