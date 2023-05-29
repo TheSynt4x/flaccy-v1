@@ -4,6 +4,11 @@ import { ref } from 'vue';
 
 let isOpened = ref(false);
 let isFormValid = ref(false);
+
+
+function create() {
+    // todo: implement create library
+}
 </script>
 
 <template>
@@ -25,7 +30,7 @@ let isFormValid = ref(false);
             ]" label="Output Path" density="compact" />
 
             <v-select :rules="[
-                v => v && v.length || 'Formats is required',
+                v => !!v || 'Formats is required',
 
             ]" label="Formats" density="compact" multiple chips
                 :items="[{ title: 'FLAC', value: '.flac' }, { title: 'MP3', value: '.mp3' }, { title: 'M4A', value: '.m4a' }]"></v-select>
