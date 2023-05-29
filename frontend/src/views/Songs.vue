@@ -1,11 +1,12 @@
 <script setup>
-import { ref, watch } from 'vue'
-
+import { ref, onMounted } from 'vue'
 import { useSongStore } from '@/store/songs';
 
 import debounce from 'lodash.debounce';
+import { useRouter } from 'vue-router';
 
 const songStore = useSongStore();
+const router = useRouter();
 
 let headers = ref([
     { title: 'Artist', key: 'artist' },
@@ -18,53 +19,82 @@ let currentPage = ref(1);
 
 let allFilters = [];
 
-async function load(q, sortBy) {
-    let filters = [];
-
-    if (q && q.length > 0) {
-        filters.push(['q', q]);
-    }
-
-    if (sortBy && sortBy.length > 0) {
-        for (const sort of sortBy) {
-            if (sort.key && sort.order) {
-                filters.push(['sorts', `${sort.key}.${sort.order}`])
-            }
-        }
-    }
-
-    filters.push(['per_page', itemsPerPage.value]);
-
-    await songStore.fetchSongs(currentPage.value, filters);
-
-    allFilters = filters;
-}
-
-async function loadItems(p) {
-    currentPage.value = p.page;
-
-    await load(search.value, p.sortBy);
-}
-
-let itemsPerPage = ref(10);
+let itemsPerPage = ref(1);
 
 let search = ref('');
 
 let isLoading = ref(false);
 
-watch(search, () => {
+let sorts = ref([]);
+
+async function parseUrlFilters() {
+    const { page, q, per_page } = router.currentRoute.value.query;
+
+    if (page) {
+        currentPage.value = page;
+    }
+
+    if (q) {
+        search.value = q;
+    }
+
+    if (per_page) {
+        itemsPerPage.value = per_page;
+    }
+}
+
+async function loadItems(context) {
     if (isLoading.value) return;
 
-    isLoading.value = true;
+    let filters = [];
+    const obj = {}
 
-    debounce(async () => {
-        currentPage.value = 1;
+    try {
+        isLoading.value = true;
 
-        await load(search.value, allFilters, itemsPerPage.value);
+        search.value = context.search || '';
+        currentPage.value = context.page || 1; ``
+        itemsPerPage.value = context.itemsPerPage || itemsPerPage.value;
+        sorts.value = context.sortBy;
+
+
+        if (currentPage.value) {
+            obj.page = currentPage.value;
+        }
+
+        if (search.value) {
+            obj.q = search.value;
+            filters.push(["q", search.value]);
+        }
+
+        if (itemsPerPage.value) {
+            obj.per_page = itemsPerPage.value;
+            filters.push(["per_page", itemsPerPage.value]);
+        }
+
+        if (sorts.value) {
+            for (const sort of sorts.value) {
+                if (sort.key && sort.order) {
+                    filters.push(['sorts', `${sort.key}.${sort.order}`])
+                }
+            }
+        }
+
+        await songStore.fetchSongs(currentPage.value, filters);
+    } finally {
+        router.push({
+            query: obj,
+        });
 
         isLoading.value = false;
-    }, 2000)();
-})
+    }
+}
+
+let debouncedLoadItems = debounce(loadItems, 300);
+
+onMounted(async () => {
+    await parseUrlFilters();
+});
 </script>
 
 <template>
@@ -79,12 +109,8 @@ watch(search, () => {
             </template>
         </v-text-field>
 
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <slot name="filters"></slot>
-        </div>
-
-        <v-data-table-server v-model:items-per-page="itemsPerPage" :headers="headers" :items-length="songStore.total"
-            :items="songStore.songsPerPage" :loading="isLoading" class="elevation-1" item-title="name" item-value="name"
-            @update:options="loadItems"></v-data-table-server>
+        <v-data-table-server v-model:items-per-page="itemsPerPage" v-model:search="search" :headers="headers"
+            :items-length="songStore.total" :items="songStore.songsPerPage" :loading="isLoading" class="elevation-1"
+            item-title="name" item-value="name" @update:options="debouncedLoadItems"></v-data-table-server>
     </div>
 </template>
