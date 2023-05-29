@@ -42,4 +42,40 @@ let filteredRoutes = computed(() => {
 .v-input__append {
   padding-top: 0 !important;
 }
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+.gap-4 {
+  gap: 1.5rem;
+}
+
+.basis-1 {
+  flex-basis: 0.25rem;
+}
+
+.basis-2 {
+  flex-basis: 0.5rem;
+}
+
+.basis-3 {
+  flex-basis: 1rem;
+}
+
+.basis-4 {
+  flex-basis: 1.5rem;
+}
+
+.basis-half {
+  flex-basis: 50%;
+}
 </style>
