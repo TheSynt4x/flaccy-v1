@@ -3,8 +3,7 @@ import { ref, watch } from 'vue'
 
 import { useSongStore } from '@/store/songs';
 
-import debounce from 'lodash.debounce'
-
+import debounce from 'lodash.debounce';
 
 const songStore = useSongStore();
 
@@ -43,8 +42,6 @@ async function load(q, sortBy) {
 
 async function loadItems(p) {
     currentPage.value = p.page;
-
-    console.log(p.sortBy)
 
     await load(search.value, p.sortBy);
 }

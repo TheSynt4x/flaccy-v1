@@ -26,6 +26,8 @@ let search = ref('');
 
 let formatFilter = ref([]);
 
+let showFilters = ref(false);
+
 const filteredLibraries = computed(() => {
     if (!formatFilter.value.length) return libraryStore.allLibraries;
 
@@ -50,25 +52,32 @@ onMounted(async () => {
         </div>
 
 
-        <div class="d-flex gap-2">
-            <v-text-field v-model="search" label="Search" class="flex-grow-1 basis-half"></v-text-field>
-            <v-autocomplete v-model="formatFilter" chips multiple label="Formats" :items="[
-                {
-                    title: 'MP3',
-                    value: '.mp3',
-                },
-                {
-                    title: 'FLAC',
-                    value: '.flac',
-                },
-                {
-                    title: 'M4A',
-                    value: '.m4a',
-                }
-            ]" class="flex-grow-1 basis-half"></v-autocomplete>
-        </div>
+        <v-text-field v-model="search" label="Search">
+            <template #append>
+                <v-btn @click="showFilters = !showFilters" icon="mdi-filter" variant="flat">
+                </v-btn>
+            </template>
+        </v-text-field>
+        <v-row v-if="showFilters">
+            <v-col cols="12" xs="12" sm="12" md="6" lg="6" xl="6">
+                <v-autocomplete v-model="formatFilter" chips multiple label="Formats" :items="[
+                    {
+                        title: 'MP3',
+                        value: '.mp3',
+                    },
+                    {
+                        title: 'FLAC',
+                        value: '.flac',
+                    },
+                    {
+                        title: 'M4A',
+                        value: '.m4a',
+                    }
+                ]" class="flex-grow-1"></v-autocomplete>
+            </v-col>
+        </v-row>
 
-        <v-data-table v-model:search="search" :items-per-page="itemsPerPage" :headers="headers"
-            :items="filteredLibraries" class="elevation-1" />
+        <v-data-table v-model:search="search" :items-per-page="itemsPerPage" :headers="headers" :items="filteredLibraries"
+            class="elevation-1" />
     </div>
 </template>
