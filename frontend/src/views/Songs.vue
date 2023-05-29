@@ -19,7 +19,7 @@ let currentPage = ref(1);
 
 let allFilters = [];
 
-let itemsPerPage = ref(1);
+let itemsPerPage = ref(10);
 
 let search = ref('');
 
