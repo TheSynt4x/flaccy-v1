@@ -1,9 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useSongStore } from '@/store/songs';
 
 import debounce from 'lodash.debounce';
 import { useRouter } from 'vue-router';
+
+import { connection } from '@/client';
+
+import useEmitter from '@/composables/useEmitter';
 
 const songStore = useSongStore();
 const router = useRouter();
@@ -22,8 +26,18 @@ let itemsPerPage = ref(10);
 let search = ref('');
 
 let isLoading = ref(false);
+let isSyncLoading = ref(false);
 
 let sorts = ref([]);
+
+function sync() {
+    isSyncLoading.value = true;
+
+    connection.send(JSON.stringify({
+        command: 'sync',
+        params: [],
+    }));
+}
 
 async function parseUrlFilters() {
     const { page, q, per_page } = router.currentRoute.value.query;
@@ -93,6 +107,24 @@ let debouncedLoadItems = debounce(loadItems, 300);
 onMounted(async () => {
     await parseUrlFilters();
 });
+
+useEmitter('message', async (event) => {
+    const data = JSON.parse(event.data);
+
+    if (data.status === 'start_refreshing_songs') {
+        await parseUrlFilters();
+
+        await loadItems({
+            search: search.value,
+            page: currentPage.value,
+            itemsPerPage: itemsPerPage.value,
+            sortBy: sorts.value,
+        });
+
+    } else if (data.status === 'success') {
+        isSyncLoading.value = false;
+    }
+});
 </script>
 
 <template>
@@ -106,7 +138,7 @@ onMounted(async () => {
 
     <v-tooltip position="top" text="Run song sync">
         <template #activator="{ props }">
-            <v-btn color="primary" v-bind="props" style="position: absolute; bottom: 1rem; right: 1rem;"
+            <v-btn :loading="isSyncLoading" :disabled="isSyncLoading" @click="sync" color="primary" v-bind="props" style="position: absolute; bottom: 1rem; right: 1rem;"
                 icon="mdi-refresh"></v-btn>
         </template>
     </v-tooltip>

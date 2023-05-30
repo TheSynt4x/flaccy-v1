@@ -33,7 +33,7 @@ function create() {
                 v => !!v || 'Formats is required',
 
             ]" label="Formats" density="compact" multiple chips
-                :items="[{ title: 'FLAC', value: '.flac' }, { title: 'MP3', value: '.mp3' }, { title: 'M4A', value: '.m4a' }]"></v-select>
+                :items="['.flac', '.mp3', '.m4a']"></v-select>
         </v-form>
 
         <template #actions>

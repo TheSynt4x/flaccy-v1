@@ -21,6 +21,9 @@ class FtpWrapper:
         self.failed = []
 
     def connect(self):
+        if settings.disable_ftp:
+            return
+
         self.ftp = FTP()
 
         self.ftp.encoding = "utf-8"

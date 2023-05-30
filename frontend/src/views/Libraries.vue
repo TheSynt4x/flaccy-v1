@@ -38,6 +38,16 @@ const filteredLibraries = computed(() => {
     });
 });
 
+const allFormats = computed(() => {
+    const formats = [];
+
+    for (const library of libraryStore.allLibraries) {
+        formats.push(...library.formats.split(',').map(format => format.trim()));
+    }
+
+    return [...new Set(formats)];
+});
+
 onMounted(async () => {
     await libraryStore.fetchLibraries();
 });
@@ -45,12 +55,11 @@ onMounted(async () => {
 
 <template>
     <div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="d-flex justify-space-between align-center mb-4">
             <h1>Libraries</h1>
 
             <CreateLibraryModal />
         </div>
-
 
         <v-text-field v-model="search" label="Search">
             <template #append>
@@ -58,22 +67,10 @@ onMounted(async () => {
                 </v-btn>
             </template>
         </v-text-field>
+
         <v-row v-if="showFilters">
-            <v-col cols="12" xs="12" sm="12" md="6" lg="6" xl="6">
-                <v-autocomplete v-model="formatFilter" chips multiple label="Formats" :items="[
-                    {
-                        title: 'MP3',
-                        value: '.mp3',
-                    },
-                    {
-                        title: 'FLAC',
-                        value: '.flac',
-                    },
-                    {
-                        title: 'M4A',
-                        value: '.m4a',
-                    }
-                ]" class="flex-grow-1"></v-autocomplete>
+            <v-col cols="12" xs="12" sm="12" md="3" lg="3" xl="3">
+                <v-autocomplete v-model="formatFilter" chips multiple label="Formats" :items="allFormats" class="flex-grow-1"></v-autocomplete>
             </v-col>
         </v-row>
 
