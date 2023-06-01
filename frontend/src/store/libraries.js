@@ -5,12 +5,14 @@ export const useLibraryStore = defineStore("libraries", {
     return {
       isLoading: false,
       libraries: {},
+      totalCount: 0
     };
   },
   getters: {
     allLibraries: (state) => {
       return Object.values(state.libraries);
     },
+    total: (state) => state.totalCount || 0,
   },
   actions: {
     async fetchLibraries(page = 1, filters = {}) {
@@ -29,5 +31,21 @@ export const useLibraryStore = defineStore("libraries", {
         this.isLoading = false;
       }
     },
+
+    async getLibrariesTotal() {
+      try {
+        this.isLoading = true;
+
+        const response = await fetch(
+          `http://localhost:8000/api/libraries/total`
+        );
+
+        const { total } = await response.json();
+
+        this.totalCount = total;
+      } finally {
+        this.isLoading = false;
+      }
+    }
   },
 });

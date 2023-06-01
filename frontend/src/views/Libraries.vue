@@ -70,7 +70,8 @@ onMounted(async () => {
 
         <v-row v-if="showFilters">
             <v-col cols="12" xs="12" sm="12" md="3" lg="3" xl="3">
-                <v-autocomplete v-model="formatFilter" chips multiple label="Formats" :items="allFormats" class="flex-grow-1"></v-autocomplete>
+                <v-autocomplete v-model="formatFilter" chips multiple label="Formats" :items="allFormats"
+                    class="flex-grow-1"></v-autocomplete>
             </v-col>
         </v-row>
 

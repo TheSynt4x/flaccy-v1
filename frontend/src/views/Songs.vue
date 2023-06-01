@@ -8,6 +8,9 @@ import { useRouter } from 'vue-router';
 import { connection } from '@/client';
 
 import useEmitter from '@/composables/useEmitter';
+import TotalArtists from '@/components/Total/TotalArtists.vue';
+import TotalSongs from '@/components/Total/TotalSongs.vue';
+import TotalAlbums from '@/components/Total/TotalAlbums.vue';
 
 const songStore = useSongStore();
 const router = useRouter();
@@ -122,6 +125,13 @@ useEmitter('message', async (event) => {
         });
 
     } else if (data.status === 'success') {
+        await loadItems({
+            search: search.value,
+            page: currentPage.value,
+            itemsPerPage: itemsPerPage.value,
+            sortBy: sorts.value,
+        });
+
         isSyncLoading.value = false;
     }
 });
@@ -129,6 +139,12 @@ useEmitter('message', async (event) => {
 
 <template>
     <h1>Songs</h1>
+
+    <v-row>
+        <total-songs></total-songs>
+        <total-albums></total-albums>
+        <total-artists></total-artists>
+    </v-row>
 
     <v-text-field v-model="search" label="Search..." density="compact" class="ma-0" />
 
@@ -138,8 +154,8 @@ useEmitter('message', async (event) => {
 
     <v-tooltip position="top" text="Run song sync">
         <template #activator="{ props }">
-            <v-btn :loading="isSyncLoading" :disabled="isSyncLoading" @click="sync" color="primary" v-bind="props" style="position: absolute; bottom: 1rem; right: 1rem;"
-                icon="mdi-refresh"></v-btn>
+            <v-btn :loading="isSyncLoading" :disabled="isSyncLoading" @click="sync" color="primary" v-bind="props"
+                style="position: absolute; bottom: 1rem; right: 1rem;" icon="mdi-refresh"></v-btn>
         </template>
     </v-tooltip>
 </template>

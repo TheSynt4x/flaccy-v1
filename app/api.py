@@ -95,6 +95,26 @@ def get_songs(
     return {"songs": [q for q in query], "total_count": total_count}
 
 
+@app.get("/api/songs/total")
+def get_songs_total():
+    return {"total": models.Song.select().count()}
+
+
+@app.get("/api/songs/artists/total")
+def get_songs_artists_total():
+    return {"total": models.Song.select(models.Song.artist).distinct().count()}
+
+
+@app.get("/api/songs/albums/total")
+def get_songs_albums_total():
+    return {"total": models.Song.select(models.Song.album).distinct().count()}
+
+
+@app.get("/api/libraries/total")
+def get_libraries_total():
+    return {"total": models.Library.select().count()}
+
+
 async def ws_send(obj_to_send: dict, websocket: WebSocket):
     logger.info(obj_to_send)
     await websocket.send_json(obj_to_send)
