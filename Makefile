@@ -12,4 +12,4 @@ install-ffmpeg:
 
 .PHONY: devserver
 devserver:
-	uvicorn app.api:app --reload & npm run --prefix frontend dev
+	uvicorn app.server:app --reload & npm run --prefix frontend dev

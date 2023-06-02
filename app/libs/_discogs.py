@@ -1,4 +1,5 @@
 import discogs_client
+import requests
 
 from app import schemas
 from app.core import logger, settings
@@ -9,6 +10,26 @@ class DiscogsWrapper:
         self.client = discogs_client.Client(
             "Flaccy/0.1", user_token=settings.discogs_token
         )
+
+    def get_artist_information(self, name: str):
+        results = self.client.search(name, type="artist")
+
+        results = results.page(0)
+
+        if len(results or []):
+            try:
+                response = requests.get(
+                    results[0].data.get("resource_url")
+                    + "?token="
+                    + settings.discogs_token
+                )
+                response.raise_for_status()
+
+                return response.json()
+            except requests.HTTPError:
+                pass
+
+        return None
 
     def get_album_art(self, song: schemas.Song):
         if not song.album or not song.artist:
