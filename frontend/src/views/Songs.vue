@@ -150,7 +150,16 @@ useEmitter('message', async (event) => {
 
     <v-data-table-server v-model:items-per-page="itemsPerPage" v-model:search="search" :headers="headers"
         :items-length="songStore.total" :items="songStore.songsPerPage" :loading="isLoading" class="elevation-1"
-        item-title="name" item-value="name" @update:options="debouncedLoadItems"></v-data-table-server>
+        item-title="name" item-value="name" @update:options="debouncedLoadItems">
+        <template #item="{item}">
+            <tr>
+                <td><router-link :to="`/artists/${item.columns.artist}`">{{item.columns.artist}}</router-link></td>
+                <td><router-link :to="`/artists/${item.columns.artist}/albums/${item.columns.album}/${item.columns.title}`">{{item.columns.title}}</router-link></td>
+                <td><router-link :to="`/artists/${item.columns.artist}/albums/${item.columns.album}`">{{ item.columns.album }}</router-link></td>
+                <td>{{ item.columns.year }}</td>
+            </tr>
+        </template>
+    </v-data-table-server>
 
     <v-tooltip position="top" text="Run song sync">
         <template #activator="{ props }">

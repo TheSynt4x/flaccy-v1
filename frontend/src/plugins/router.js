@@ -21,6 +21,13 @@ export const routes = [
             icon: 'mdi-music',
             inNavbar: true,
         }
+    },
+    {
+        path: '/artists/:name',
+        component: () => import('@/views/Artist.vue'),
+        meta: {
+            inNavbar: false,
+        }
     }
 ];
 
